@@ -14,8 +14,8 @@ const App = () => {
     "C"
   ]);
   return (
-    <div id="drum-machine">
-      <div id="display">
+    <div id="drum-machine" className="container">
+      <div id="display" className="display">
         {keys.map((key, index) => (
           <Box text={key} key={index} />
         ))}
@@ -24,6 +24,6 @@ const App = () => {
   );
 };
 
-const Box = (props) => <div className="Box">{props.text}</div>;
+const Box = (props) => <div className="box">{props.text}</div>;
 
 export default App;
