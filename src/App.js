@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React, { useEffect, useState } from "react";
 import "./styles.css";
 
 const bankOne = [
@@ -59,28 +59,77 @@ const bankOne = [
 ];
 
 const App = () => {
+  const [volume, setVolume] = useState(1);
+
   return (
     <div id="drum-machine" className="container">
       <div id="display" className="display">
         {bankOne.map((key, index) => (
-          <Box text={key.keyTrigger} key={index} audioUrl={key.url} />
+          <DrumPad
+            text={key.keyTrigger}
+            key={index}
+            audioUrl={key.url}
+            volume={volume}
+          />
         ))}
+        <br />
+        <h1>Press a key</h1>
+        <br />
+        <h4>Volume</h4>
+        <input
+          className="w-50"
+          type="range"
+          step={0.01}
+          volume={volume}
+          onChange={(e) => setVolume(e.target.value)}
+          max={1}
+          min={0}
+        />
       </div>
     </div>
   );
 };
 
-const Box = ({ text, audioUrl }) => {
-  const sound = createRef();
+const DrumPad = ({ text, audioUrl, volume }) => {
+  // const sound = createRef();
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKey);
+    // return () => {
+    //   document.removeEventListener("keydown", handleKey);
+    // };
+  });
+
+  useEffect(() => {}, []);
 
   const playSound = () => {
-    sound.current.play();
+    const audioTag = document.getElementById(text);
+    setActive(true);
+    setTimeout(() => setActive(false), 200);
+    audioTag.currentTime = 0;
+    audioTag.volume = volume;
+    audioTag.play();
+
+    const parent = audioTag.parentNode;
+    const display = parent.parentNode;
+    display.querySelector("h1").innerText = `${text} is playing`;
+  };
+
+  const handleKey = (event) => {
+    if (event && event.key.toUpperCase() === text) {
+      playSound();
+    }
   };
 
   return (
-    <div className="box" onClick={playSound}>
+    <div
+      className={`drum-pad ${active && "active"}`}
+      onClick={playSound}
+      id={`drum-${text}`}
+    >
       {text}
-      <audio ref={sound} src={audioUrl} className="clip" id={text} />
+      <audio src={audioUrl} className="clip" id={text} />
     </div>
   );
 };
